@@ -38,10 +38,10 @@ I've tried to visit it, but I couldn't.
 
 But there must be the way to fetch those secrets. From room description I know that someone will check my prompts, so there must be some "human" intervention here. So, knowing it I've checked if *Juicy* can write a code and output it in the chat box.
 
-![[Screenshot 2026-03-05 121953.png]]And from here I'm gonna try some XSS to grab this secrets.
-This one took me a while. I stick to DAN - *Do-Anything-Now* methodology because it worked before. After many tries finally i get a response to my python server with the encoded message:
-
 ![](juicy7.png)
+
+And from here I'm gonna try some XSS to grab this secrets.
+This one took me a while. I stick to DAN - *Do-Anything-Now* methodology because it worked before. After many tries finally i get a response to my python server with the encoded message:
 
 ![](juicy8.png)
 
