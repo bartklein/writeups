@@ -48,7 +48,7 @@ Content-Type: application/json
 }
 ```
 
-![Saving malicious preferences](preferences.png)
+![Saving malicious preferences](images/preferences.png)
 
 Key points:
 - `renderMode: "full"` unlocks `id` attributes in DOMPurify and enables content enhancements.
@@ -123,7 +123,7 @@ Both are bypassed:
 - `top['docu'+'ment']['coo'+'kie']` — neither `document` nor `cookie` appear as literal substrings, so the regex passes the value clean.
 - `navigator.sendBeacon` — `navigator` is not in the blocklist.
 
-![Malicious note content](malicious-note.png)
+![Malicious note content](images/malicious-note.png)
 
 ---
 
@@ -169,7 +169,7 @@ The fix: intercept the report request in Burp Suite and manually replace the `ur
 }
 ```
 
-![Intercepted report request in Burp](intercepted-report-request.png)
+![Intercepted report request in Burp](images/intercepted-report-request.png)
 
 The bot visits the URL, the full chain executes, and the cookie is exfiltrated via `navigator.sendBeacon`.
 
@@ -206,7 +206,7 @@ The bot visits the URL, the full chain executes, and the cookie is exfiltrated v
 
 ## Flag
 
-![Captured flag](captured-flag.png)
+![Captured flag](images/captured-flag.png)
 
 ```
 INTIGRITI{019d955f-1643-77a6-99ef-1c10975ab284}

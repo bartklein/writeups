@@ -12,15 +12,15 @@ Happy Hunting!
 Let's jump into Splunk instance.
 First click on "Search & Reporting".
 
-![](eclipse1.png)
+![](images/eclipse1.png)
 
 We know when an event occurred it'll help us pinpoint time frame in the logs.
 
-![](eclipse2.png)
+![](images/eclipse2.png)
 
 Now we're seeing events that happened since **May 16th 2022**.
 
-![](eclipse3.png)
+![](images/eclipse3.png)
 
 Remember about *wildcard* in the search bar.
 Now we can focus on answering the questions.
@@ -30,9 +30,9 @@ Now we can focus on answering the questions.
 Having a knowledge that in Sysmon Event ID of process creation is 11, i could apply *EventCode=11* to the search query.
 Also from the room description I knew whose machine was infected. I found probable user and apply it as well. One more thing worth noting is that attackers like to abuse powershell/ With this in mind i wrote search query: **\* EventCode=11 User="DESKTOP-TBV8NEF\\\keegan" Image=\*powershell.exe**. I've received nine events back and in one of them i've found a binary file name.
 
-![](eclipse4.png)
+![](images/eclipse4.png)
 
-![](eclipse5.png)
+![](images/eclipse5.png)
 
 **Answer: OUTSTANDING_GUTTER.exe**
 
@@ -41,19 +41,19 @@ Also from the room description I knew whose machine was infected. I found probab
 Here i've added new fields that can be helpful *CommandLine*.
 And i've found encoded in base64 command that was executied on the machine. I used CyberChef for decoding and there was URL used to download malicious binary.
 
-![](eclipse6.png)
+![](images/eclipse6.png)
 
-![](eclipse7.png)
+![](images/eclipse7.png)
 
-![](eclipse8.png)
+![](images/eclipse8.png)
 
-![](eclipse9.png)
+![](images/eclipse9.png)
 
 **Answer: hxxp\[://]886e-181-215-214-32\[.]ngrok\[.]io**
 
 **Question 3: What Windows executable was used to download the suspicious binary? Enter full path.**
 
-![](eclipse10.png)
+![](images/eclipse10.png)
 
 **Answer: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe**
 
@@ -61,7 +61,7 @@ And i've found encoded in base64 command that was executied on the machine. I us
 
 I've searched for malicious binary we've found earlier: *\*OUTSTANDING_GUTTER.exe** and looked into *CommandLine* field for what commands has been executed. 
 
-![](eclipse11.png)
+![](images/eclipse11.png)
 
 **Answer: "C:\Windows\system32\schtasks.exe" /Create /TN OUTSTANDING_GUTTER.exe /TR C:\Windows\Temp\COUTSTANDING_GUTTER.exe /SC ONEVENT /EC Application /MO *\[System/EventID=777] /RU SYSTEM /f**
 
@@ -69,7 +69,7 @@ I've searched for malicious binary we've found earlier: *\*OUTSTANDING_GUTTER.ex
 
 Suspicious binary was executed with *schtasks.exe*. Let's search for it and we can see the command it was ran.
 
-![](eclipse12.png)
+![](images/eclipse12.png)
 
 **Answer: NT AUTHORITY\SYSTEM;"C:\Windows\system32\schtasks.exe" /Run /TN OUTSTANDING_GUTTER.exe**
 
@@ -77,7 +77,7 @@ Suspicious binary was executed with *schtasks.exe*. Let's search for it and we c
 
 I've putted suspicious binary name *\*OUTSTANDING_GUTTER.exe* into query and checked *QueryName* field to know to which domain suspicious binary connected.
 
-![](eclipse13.png)
+![](images/eclipse13.png)
 
 **Answer: hxxp\[://]9030-181-215-214-32\[.]ngrok\[.]io**
 
@@ -85,7 +85,7 @@ I've putted suspicious binary name *\*OUTSTANDING_GUTTER.exe* into query and che
 
 Search for a powershell extension - *.ps1*.
 
-![](eclipse14.png)
+![](images/eclipse14.png)
 
 **Answer: script.ps1**
 
@@ -93,9 +93,9 @@ Search for a powershell extension - *.ps1*.
 
 Check hash SHA256 of a executed script.ps1 on virustotatl.com and you can see that originally file name was *BlackSun.ps1*.
 
-![](eclipse15.png)
+![](images/eclipse15.png)
 
-![](eclipse16.png)
+![](images/eclipse16.png)
 
 **Answer: BlackSun.ps1**
 
@@ -103,7 +103,7 @@ Check hash SHA256 of a executed script.ps1 on virustotatl.com and you can see th
 
 Search for *\*txt* the note should be in this format.
 
-![](eclipse17.png)
+![](images/eclipse17.png)
 
 **Answer: C:\Users\keegan\Downloads\vasg6b0wmw029hd\BlackSun_README.txt**
 
@@ -111,7 +111,7 @@ Search for *\*txt* the note should be in this format.
 
 I searched for common image file extension by using *\*.jpeg OR .jpg OR .png* and saw suspicious file name that was and answer.
 
-![](eclipse18.png)
+![](images/eclipse18.png)
 
 **Answer: C:\Users\Public\Pictures\blacksun.jpg**
 

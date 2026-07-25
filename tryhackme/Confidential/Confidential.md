@@ -8,14 +8,17 @@ Room description:
 *The file you need is located in **/home/ubuntu/confidential** on the VM.*
 
 After booting up VM I was greeted with a sighting of opened folder with a pdf file in it.
-![](confidential1.png)
+
+![](images/confidential1.png)
 
 After opening it in LibreOffice my first thought was to move it around. That's how i uncovered the QR code.
-![](confidential2.png)
+
+![](images/confidential2.png)
 
 Next i took my phone, opened camera and scanned it.
 And i found the flag! Pretty simple challenge.
-![](confidential3.jpg)
+
+![](images/confidential3.jpg)
 
 **Answer: flag{e08e6ce2f077a1b420cfd4a5d1a57a8d}**
 

