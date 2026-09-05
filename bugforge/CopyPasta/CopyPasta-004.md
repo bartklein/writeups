@@ -10,4 +10,4 @@ I found that user named `pythonista` owns missing snippet. From the `/api/profil
 I took step back, and enumerate app further. I found an endpoint where I could change my password - `api/profile/password` which accepts two json key-pair values - password and user_id. 
 I took this request to a Burp Repeater, and I changed `user_id` to `1` which is id of an admin account. The request was successfully accepted by a server, and I logged in into administrator account, where the flag was waiting.
 
-![](Images/copypasta2.png)
+![](Images/copypasta-004.png)

@@ -8,4 +8,4 @@ After many attempts, I decided to mess with old tricks and try to use cyrillic `
 I tried all combinations, but `/api/login` endpoint still shows that my role is set to user.
 This is where it gets tricky. Despite the fact that I registered as a `ａｄｍｉｎ` not `admin`, and I don't have my role set to admin, I can access admin endpoints! So, I went straight into `/api/admin/users` endpoints, which is the most interesting one found in the js file, and there in the `X-FLAG` response header was a flag for this challenge.
 
-![](Images/cheesydoesit1.png)
+![](Images/cheesydoesit-011.png)

